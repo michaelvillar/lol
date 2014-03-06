@@ -1,10 +1,17 @@
 City = require('city.coffee')
+Window = require('window.coffee')
 
 TILE_WIDTH = 10
 TILE_HEIGHT = 10
 
+elementPos = (el) ->
+  [parseInt(el.style.left, 10), parseInt(el.style.top, 10)]
+
 class AppController
   constructor: (@el) ->
+    @tileWindow = new Window
+    @tileWindow.show([10,10])
+
     @city = new City
     console.log 'population', @city.population
     avg = @city.population / @city.size[0] / @city.size[1]
@@ -23,14 +30,43 @@ class AppController
         tile = document.createElement('div')
         tile.classList.add("tile")
         tile.classList.add("tile#{x}-#{y}")
+        tile.setAttribute('data-pos', "#{x},#{y}")
         tile.style.left = x * TILE_WIDTH + "px"
         tile.style.top = y * TILE_HEIGHT + "px"
         tile.style.width = TILE_WIDTH + "px"
         tile.style.height = TILE_HEIGHT + "px"
-        ratio = @city.populationAt(x, y) / max
+        ratio = @city.populationAt([x, y]) / max
         white = Math.round(255 * 2 * (0.5 - Math.min(0.5, ratio)))
         tile.style.backgroundColor = "rgb(255, #{Math.round(255 * (1 - ratio))}, #{white})"
+        tile.addEventListener('mouseover', @tileMouseOver)
+        tile.addEventListener('click', @tileClick)
         row.push(tile)
         @el.appendChild(tile)
+
+  tileMouseOver: (e) =>
+    return if @selectedTile
+    tile = e.srcElement
+
+    @updateWindow(tile)
+
+  tileClick: (e) =>
+    tile = e.srcElement
+    @selectedTile.classList.remove('selected') if @selectedTile
+    if tile == @selectedTile
+      @selectedTile = null
+      return
+    tile.classList.add('selected')
+    @selectedTile = tile
+    @updateWindow(tile)
+
+  updateWindow: (tile) =>
+    index = tile.getAttribute('data-pos').split(',')
+    index[0] = parseInt(index[0])
+    index[1] = parseInt(index[1])
+
+    content = "Pop: #{@city.populationAt(index)}<br>
+    Ground price: $#{@city.priceAt(index)}
+    "
+    @tileWindow.setContent(content)
 
 module.exports = AppController

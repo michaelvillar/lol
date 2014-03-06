@@ -13,18 +13,20 @@
   City = (function() {
 
     function City() {
+      this.priceAt = __bind(this.priceAt, this);
+
       this.populationAt = __bind(this.populationAt, this);
 
       this.distribute = __bind(this.distribute, this);
 
       var cluster, row, x, y, _i, _j, _ref, _ref1;
-      this.size = [100, 100];
+      this.size = [100, 60];
       this.clusters = [];
       this.clustersGrid = [];
-      for (y = _i = 0, _ref = this.size[1] - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; y = 0 <= _ref ? ++_i : --_i) {
+      for (x = _i = 0, _ref = this.size[0] - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; x = 0 <= _ref ? ++_i : --_i) {
         row = [];
         this.clustersGrid.push(row);
-        for (x = _j = 0, _ref1 = this.size[0] - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; x = 0 <= _ref1 ? ++_j : --_j) {
+        for (y = _j = 0, _ref1 = this.size[1] - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; y = 0 <= _ref1 ? ++_j : --_j) {
           cluster = new Cluster([]);
           this.clusters.push(cluster);
           row.push(cluster);
@@ -37,12 +39,12 @@
       var addPeople, center, centerRef, centerRefIndex, centers, centersCount, cluster, highBound, i, lowBound, number, nx, ny, padding, x, y, _i, _len, _results,
         _this = this;
       this.population = 0;
-      lowBound = 750;
-      highBound = 1000;
-      centersCount = 30;
+      lowBound = 0.075 * this.size[0] * this.size[1];
+      highBound = 0.1 * this.size[0] * this.size[1];
+      centersCount = 0.003 * this.size[0] * this.size[1];
       centers = [];
-      padding = 35;
-      centers.push([rand(this.size[0] / 2 - padding, this.size[0] / 2 + padding), rand(this.size[1] / 2 - padding, this.size[1] / 2 + padding)]);
+      padding = 0.0035 * this.size[0] * this.size[1];
+      centers.push([Math.min(this.size[0] - 1, Math.max(0, rand(this.size[0] / 2 - padding, this.size[0] / 2 + padding))), Math.min(this.size[1] - 1, Math.max(0, rand(this.size[1] / 2 - padding, this.size[1] / 2 + padding)))]);
       while (centers.length < centersCount) {
         centerRefIndex = rand(0, centers.length - 1);
         centerRef = centers[centerRefIndex];
@@ -108,8 +110,16 @@
       return _results;
     };
 
-    City.prototype.populationAt = function(x, y) {
+    City.prototype.populationAt = function(_arg) {
+      var x, y;
+      x = _arg[0], y = _arg[1];
       return this.clustersGrid[x][y].population();
+    };
+
+    City.prototype.priceAt = function(_arg) {
+      var x, y;
+      x = _arg[0], y = _arg[1];
+      return this.clustersGrid[x][y].price();
     };
 
     return City;

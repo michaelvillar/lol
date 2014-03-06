@@ -3,14 +3,37 @@
   padding: 0
   box-sizing: border-box
   -webkit-box-sizing: border-box
+  font-family: Helvetica
 }
 
 body {
-  background: #f0f0f0
+  background: white
 }
 
 .tile {
   position: absolute
-  // border-bottom: 1px solid rgba(0,0,0,.2)
-  // border-right: 1px solid rgba(0,0,0,.2)
+
+  &:hover {
+    border: 2px solid #00b9f0
+  }
+
+  &.selected {
+    border: 2px solid black
+  }
+}
+
+.window {
+  position: absolute
+  width: 220px
+  height: 30px
+  background: white
+  border-radius: 5px
+  box-shadow: 0 1px 5px rgba(0,0,0,.5)
+  z-index: 1
+  pointer-events: none
+  font-size: 11px
+
+  p {
+    padding: 5px
+  }
 }

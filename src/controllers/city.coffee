@@ -5,14 +5,14 @@ rand = (from, to) =>
 
 class City
   constructor: ->
-    @size = [100,100]
+    @size = [100,60]
 
     @clusters = []
     @clustersGrid = []
-    for y in [0..@size[1] - 1]
+    for x in [0..@size[0] - 1]
       row = []
       @clustersGrid.push(row)
-      for x in [0..@size[0] - 1]
+      for y in [0..@size[1] - 1]
         cluster = new Cluster([])
         @clusters.push(cluster)
         row.push(cluster)
@@ -21,15 +21,15 @@ class City
 
   distribute: =>
     @population = 0
-    lowBound = 750
-    highBound = 1000
-    centersCount = 30
+    lowBound = 0.075 * @size[0] * @size[1]
+    highBound = 0.1 * @size[0] * @size[1]
+    centersCount = 0.003 * @size[0] * @size[1]
     centers = []
 
     # Find first center randomly around the center of the map
-    padding = 35
-    centers.push([rand(@size[0] / 2 - padding, @size[0] / 2 + padding),
-                  rand(@size[1] / 2 - padding, @size[1] / 2 + padding)])
+    padding = 0.0035 * @size[0] * @size[1]
+    centers.push([Math.min(@size[0] - 1, Math.max(0, rand(@size[0] / 2 - padding, @size[0] / 2 + padding))),
+                  Math.min(@size[1] - 1, Math.max(0, rand(@size[1] / 2 - padding, @size[1] / 2 + padding)))])
 
     # Find other centers randomly around one another center
     while centers.length < centersCount
@@ -42,9 +42,6 @@ class City
       return if nx < 0 or nx >= @size[0]
       return if ny < 0 or ny >= @size[1]
       cluster = @clustersGrid[nx][ny]
-      # 1 => 0.9
-      # 2 => 0.8
-
       k = Math.max(0.01, 1 - (Math.abs(i) / 25))
       number = rand(lowBound * k, highBound * k)
 
@@ -70,7 +67,10 @@ class City
             ny = center[1] + y
             addPeople(Math.sqrt(x * x + y * y), nx, ny)
 
-  populationAt: (x, y) =>
+  populationAt: ([x, y]) =>
     @clustersGrid[x][y].population()
+
+  priceAt: ([x, y]) =>
+    @clustersGrid[x][y].price()
 
 module.exports = City

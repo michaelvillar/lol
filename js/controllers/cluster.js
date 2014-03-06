@@ -7,6 +7,8 @@
 
     function Cluster(people) {
       this.people = people != null ? people : [];
+      this.price = __bind(this.price, this);
+
       this.population = __bind(this.population, this);
 
     }
@@ -23,6 +25,10 @@
       return this.people.reduce(function(pv, cv) {
         return pv + cv;
       }, 0);
+    };
+
+    Cluster.prototype.price = function() {
+      return Math.ceil(this.population() * 13.3 / 500) * 500;
     };
 
     return Cluster;
