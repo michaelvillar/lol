@@ -3,6 +3,7 @@ Window = require('window.coffee')
 
 TILE_WIDTH = 10
 TILE_HEIGHT = 10
+AREA_RADIUS = 5
 
 elementPos = (el) ->
   [parseInt(el.style.left, 10), parseInt(el.style.top, 10)]
@@ -11,6 +12,12 @@ class AppController
   constructor: (@el) ->
     @tileWindow = new Window
     @tileWindow.show([10,10])
+
+    @areaElement = document.createElement('div')
+    @areaElement.classList.add('area')
+    @areaElement.style.width = TILE_WIDTH * AREA_RADIUS * 2 + "px"
+    @areaElement.style.height = TILE_HEIGHT * AREA_RADIUS * 2 + "px"
+    document.body.appendChild(@areaElement)
 
     @city = new City
     console.log 'population', @city.population
@@ -60,11 +67,16 @@ class AppController
     @updateWindow(tile)
 
   updateWindow: (tile) =>
+    pos = elementPos(tile)
+    @areaElement.style.left = pos[0] + (TILE_WIDTH / 2) - (AREA_RADIUS * TILE_WIDTH) + "px"
+    @areaElement.style.top = pos[1] + (TILE_HEIGHT / 2) - (AREA_RADIUS * TILE_HEIGHT) + "px"
+
     index = tile.getAttribute('data-pos').split(',')
     index[0] = parseInt(index[0])
     index[1] = parseInt(index[1])
 
     content = "Pop: #{@city.populationAt(index)}<br>
+    Area pop: #{@city.populationAt(index, AREA_RADIUS)}<br>
     Ground price: $#{@city.priceAt(index)}
     "
     @tileWindow.setContent(content)

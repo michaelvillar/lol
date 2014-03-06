@@ -39,8 +39,8 @@
       var addPeople, center, centerRef, centerRefIndex, centers, centersCount, cluster, highBound, i, lowBound, number, nx, ny, padding, x, y, _i, _len, _results,
         _this = this;
       this.population = 0;
-      lowBound = 0.075 * this.size[0] * this.size[1];
-      highBound = 0.1 * this.size[0] * this.size[1];
+      lowBound = 0.0075 * this.size[0] * this.size[1];
+      highBound = 0.01 * this.size[0] * this.size[1];
       centersCount = 0.003 * this.size[0] * this.size[1];
       centers = [];
       padding = 0.0035 * this.size[0] * this.size[1];
@@ -110,10 +110,28 @@
       return _results;
     };
 
-    City.prototype.populationAt = function(_arg) {
-      var x, y;
+    City.prototype.populationAt = function(_arg, radius) {
+      var nx, ny, pop, x, y, _i, _j, _ref, _ref1, _ref2, _ref3;
       x = _arg[0], y = _arg[1];
-      return this.clustersGrid[x][y].population();
+      if (radius == null) {
+        radius = 0;
+      }
+      pop = 0;
+      for (nx = _i = _ref = x - radius, _ref1 = x + radius; _ref <= _ref1 ? _i <= _ref1 : _i >= _ref1; nx = _ref <= _ref1 ? ++_i : --_i) {
+        for (ny = _j = _ref2 = y - radius, _ref3 = y + radius; _ref2 <= _ref3 ? _j <= _ref3 : _j >= _ref3; ny = _ref2 <= _ref3 ? ++_j : --_j) {
+          if (nx < 0 || nx >= this.size[0]) {
+            continue;
+          }
+          if (ny < 0 || ny >= this.size[1]) {
+            continue;
+          }
+          if (Math.sqrt((nx - x) * (nx - x) + (ny - y) * (ny - y)) > radius) {
+            continue;
+          }
+          pop += this.clustersGrid[nx][ny].population();
+        }
+      }
+      return pop;
     };
 
     City.prototype.priceAt = function(_arg) {

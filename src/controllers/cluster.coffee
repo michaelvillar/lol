@@ -10,6 +10,6 @@ class Cluster
     , 0
 
   price: =>
-    Math.ceil(@population() * 13.3 / 500) * 500
+    Math.ceil(@population() * 1314 / 500) * 500
 
 module.exports = Cluster

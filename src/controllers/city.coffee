@@ -21,8 +21,8 @@ class City
 
   distribute: =>
     @population = 0
-    lowBound = 0.075 * @size[0] * @size[1]
-    highBound = 0.1 * @size[0] * @size[1]
+    lowBound = 0.0075 * @size[0] * @size[1]
+    highBound = 0.01 * @size[0] * @size[1]
     centersCount = 0.003 * @size[0] * @size[1]
     centers = []
 
@@ -67,8 +67,15 @@ class City
             ny = center[1] + y
             addPeople(Math.sqrt(x * x + y * y), nx, ny)
 
-  populationAt: ([x, y]) =>
-    @clustersGrid[x][y].population()
+  populationAt: ([x, y], radius = 0) =>
+    pop = 0 # @clustersGrid[x][y].population()
+    for nx in [x - radius..x + radius]
+      for ny in [y - radius..y + radius]
+        continue if nx < 0 or nx >= @size[0]
+        continue if ny < 0 or ny >= @size[1]
+        continue if Math.sqrt((nx - x) * (nx - x) + (ny - y) * (ny - y)) > radius
+        pop += @clustersGrid[nx][ny].population()
+    pop
 
   priceAt: ([x, y]) =>
     @clustersGrid[x][y].price()

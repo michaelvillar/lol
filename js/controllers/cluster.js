@@ -28,7 +28,7 @@
     };
 
     Cluster.prototype.price = function() {
-      return Math.ceil(this.population() * 13.3 / 500) * 500;
+      return Math.ceil(this.population() * 1314 / 500) * 500;
     };
 
     return Cluster;
