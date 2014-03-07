@@ -1,84 +1,73 @@
-City = require('city.coffee')
+Controller = require('controller.coffee')
+MapController = require('mapController.coffee')
+GameController = require('gameController.coffee')
 Window = require('window.coffee')
+Toolbar = require('toolbar.coffee')
+Station = require('station.coffee')
+City = require('city.coffee')
 
-TILE_WIDTH = 10
-TILE_HEIGHT = 10
-AREA_RADIUS = 5
-
-elementPos = (el) ->
-  [parseInt(el.style.left, 10), parseInt(el.style.top, 10)]
-
-class AppController
+class AppController extends Controller
   constructor: (@el) ->
-    @tileWindow = new Window
-    @tileWindow.show([10,10])
+    super
 
-    @areaElement = document.createElement('div')
-    @areaElement.classList.add('area')
-    @areaElement.style.width = TILE_WIDTH * AREA_RADIUS * 2 + "px"
-    @areaElement.style.height = TILE_HEIGHT * AREA_RADIUS * 2 + "px"
-    document.body.appendChild(@areaElement)
-
+    @cash = 1000000
     @city = new City
-    console.log 'population', @city.population
-    avg = @city.population / @city.size[0] / @city.size[1]
-    console.log 'avg', avg
 
-    max = 0
-    for cluster in @city.clusters
-      max = Math.max(cluster.population(), max)
-    console.log 'max', max
+    @toolbarAction = 'normal'
+    @toolbar = new Toolbar
+    @toolbar.on 'toolbar.tool.normal', =>
+      @toolbarAction = 'normal'
+    @toolbar.on 'toolbar.tool.build', =>
+      @toolbarAction = 'build'
+    @updateToolbarCash()
 
-    @tiles = []
-    for y in [0..@city.size[1] - 1]
-      row = []
-      @tiles.push(row)
-      for x in [0..@city.size[0] - 1]
-        tile = document.createElement('div')
-        tile.classList.add("tile")
-        tile.classList.add("tile#{x}-#{y}")
-        tile.setAttribute('data-pos', "#{x},#{y}")
-        tile.style.left = x * TILE_WIDTH + "px"
-        tile.style.top = y * TILE_HEIGHT + "px"
-        tile.style.width = TILE_WIDTH + "px"
-        tile.style.height = TILE_HEIGHT + "px"
-        ratio = @city.populationAt([x, y]) / max
-        white = Math.round(255 * 2 * (0.5 - Math.min(0.5, ratio)))
-        tile.style.backgroundColor = "rgb(255, #{Math.round(255 * (1 - ratio))}, #{white})"
-        tile.addEventListener('mouseover', @tileMouseOver)
-        tile.addEventListener('click', @tileClick)
-        row.push(tile)
-        @el.appendChild(tile)
+    document.body.appendChild(@toolbar.el)
 
-  tileMouseOver: (e) =>
-    return if @selectedTile
-    tile = e.srcElement
+    @mapController = new MapController(@city)
+    @mapController.on 'mapController.click', @mapControllerClick
+    @mapController.on 'mapController.over', @mapControllerOver
+    document.body.appendChild(@mapController.el)
 
-    @updateWindow(tile)
+    @gameController = new GameController(@city)
 
-  tileClick: (e) =>
-    tile = e.srcElement
-    @selectedTile.classList.remove('selected') if @selectedTile
-    if tile == @selectedTile
-      @selectedTile = null
-      return
-    tile.classList.add('selected')
-    @selectedTile = tile
-    @updateWindow(tile)
+    @infoWindow = new Window
+    @infoWindow.show([8,56])
 
-  updateWindow: (tile) =>
-    pos = elementPos(tile)
-    @areaElement.style.left = pos[0] + (TILE_WIDTH / 2) - (AREA_RADIUS * TILE_WIDTH) + "px"
-    @areaElement.style.top = pos[1] + (TILE_HEIGHT / 2) - (AREA_RADIUS * TILE_HEIGHT) + "px"
+    # @areaElement = document.createElement('div')
+    # @areaElement.classList.add('area')
+    # @areaElement.style.width = TILE_WIDTH * AREA_RADIUS * 2 + "px"
+    # @areaElement.style.height = TILE_HEIGHT * AREA_RADIUS * 2 + "px"
+    # document.body.appendChild(@areaElement)
 
-    index = tile.getAttribute('data-pos').split(',')
-    index[0] = parseInt(index[0])
-    index[1] = parseInt(index[1])
+  mapControllerClick: (data) =>
+    if @toolbarAction == 'build'
+      price = @city.priceAt(data.index)
+      if @cash < price
+        return alert "You don't have enough money!"
+      if confirm "Are you sure to build this station for $#{price}?"
+        @incrementCash(-price)
+        @city.addStation(new Station(data.index))
 
+  mapControllerOver: (data) =>
+    index = data.index
     content = "Pop: #{@city.populationAt(index)}<br>
     Area pop: #{@city.populationAt(index, AREA_RADIUS)}<br>
     Ground price: $#{@city.priceAt(index)}
     "
-    @tileWindow.setContent(content)
+
+    station = @city.stationAt(index)
+    if station
+      content += "<br>Station<br>
+      Pending people: #{station.pendingPeople()}
+      "
+
+    @infoWindow.setContent(content)
+
+  incrementCash: (cash) =>
+    @cash += cash
+    @updateToolbarCash()
+
+  updateToolbarCash: =>
+    @toolbar.setCash("$" + @cash)
 
 module.exports = AppController

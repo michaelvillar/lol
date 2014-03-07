@@ -1,11 +1,18 @@
+Model = require('model.coffee')
 Cluster = require('cluster.coffee')
 
 rand = (from, to) =>
   Math.round(Math.random() * (to - from) + from)
 
-class City
+class City extends Model
   constructor: ->
-    @size = [100,60]
+    super
+    @size = [100,100]
+
+    @stations = []
+    @stationsGrid = {}
+    for x in [0..@size[0] - 1]
+      @stationsGrid[x] = {}
 
     @clusters = []
     @clustersGrid = []
@@ -27,7 +34,7 @@ class City
     centers = []
 
     # Find first center randomly around the center of the map
-    padding = 0.0035 * @size[0] * @size[1]
+    padding = 0.0015 * @size[0] * @size[1]
     centers.push([Math.min(@size[0] - 1, Math.max(0, rand(@size[0] / 2 - padding, @size[0] / 2 + padding))),
                   Math.min(@size[1] - 1, Math.max(0, rand(@size[1] / 2 - padding, @size[1] / 2 + padding)))])
 
@@ -42,7 +49,8 @@ class City
       return if nx < 0 or nx >= @size[0]
       return if ny < 0 or ny >= @size[1]
       cluster = @clustersGrid[nx][ny]
-      k = Math.max(0.01, 1 - (Math.abs(i) / 25))
+      r = 0.0025 * @size[0] * @size[1]
+      k = Math.max(0.01, 1 - (Math.abs(i) / r))
       number = rand(lowBound * k, highBound * k)
 
       cluster.addPeople(number)
@@ -79,5 +87,14 @@ class City
 
   priceAt: ([x, y]) =>
     @clustersGrid[x][y].price()
+
+  addStation: (station) =>
+    return if @stationsGrid[station.index[0]][station.index[1]] # We don't want two stations at the same place
+    @stationsGrid[station.index[0]][station.index[1]] = station
+    @stations.push(station)
+    @trigger('city.station.added', station)
+
+  stationAt: ([x, y]) =>
+    @stationsGrid[x][y]
 
 module.exports = City

@@ -1,8 +1,16 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-box-sizing:border-box;font-family:Helvetica}
 body{background:#fff}
-.tile{position:absolute;}
-.tile:hover{border:2px solid #00b9f0}
-.tile.selected{border:2px solid #000}
+.toolbar{position:fixed;left:0;top:0;right:0;background:rgba(0,0,0,0.5);z-index:200;padding:4px;}
+.toolbar button{appearance:none;-webkit-appearance:none;border:none;font-size:13px;padding:6px;border-radius:7px;margin:4px;background:#fff;color:#000;border:2px solid #fff;}
+.toolbar button.selected{border:2px solid #00b9f0}
+.toolbar button:active{background:#00b9f0;border:2px solid #00b9f0;color:#fff}
+.toolbar button:active,.toolbar button:focus{outline:none}
+.toolbar .cash{position:absolute;color:#fff;top:5px;right:7px;font-size:15px;font-weight:bold}
+.map .tile{position:absolute;}
+.map .tile:hover{border:2px solid #000}
+.map .tile.selected{border:2px solid #00b9f0}
+.map .station{position:absolute;background:rgba(98,167,255,0.5);pointer-events:none;}
+.map .station .peopleBar{width:5px;background:#008000}
 .area{position:absolute;z-index:1;background-color:rgba(0,185,240,0.25);border-radius:1000px;pointer-events:none}
-.window{position:absolute;width:220px;height:100px;background:#fff;border-radius:5px;box-shadow:0 1px 5px rgba(0,0,0,0.5);z-index:100;pointer-events:none;font-size:11px;}
-.window p{padding:5px}
+.window{position:fixed;width:220px;height:100px;background:rgba(0,0,0,0.5);border-radius:5px;box-shadow:0 2px 0 rgba(0,0,0,0.4);z-index:100;pointer-events:none;font-size:13px;color:#fff;border:1px solid rgba(0,0,0,0.7);}
+.window p{padding:8px}

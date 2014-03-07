@@ -10,15 +10,74 @@ body {
   background: white
 }
 
-.tile {
-  position: absolute
+.toolbar {
+  position: fixed
+  left: 0
+  top: 0
+  right: 0
+  background: rgba(0,0,0,.5)
+  z-index: 200
+  padding: 4px
 
-  &:hover {
-    border: 2px solid #00b9f0
+  button {
+    appearance: none
+    -webkit-appearance: none
+    border: none
+    font-size: 13px
+    padding: 6px
+    border-radius: 7px
+    margin: 4px
+    background: white
+    color: black
+    border: 2px solid white
+
+    &.selected {
+      border: 2px solid #00b9f0
+    }
+
+    &:active {
+      background: #00b9f0
+      border: 2px solid #00b9f0
+      color: white
+    }
+
+    &:active, &:focus {
+      outline: none
+    }
   }
 
-  &.selected {
-    border: 2px solid black
+  .cash {
+    position: absolute
+    color: white
+    top: 5px
+    right: 7px
+    font-size: 15px
+    font-weight: bold
+  }
+}
+
+.map {
+  .tile {
+    position: absolute
+
+    &:hover {
+      border: 2px solid black
+    }
+
+    &.selected {
+      border: 2px solid #00b9f0
+    }
+  }
+
+  .station {
+    position: absolute
+    background: rgba(98, 167, 255, .5)
+    pointer-events: none
+
+    .peopleBar {
+      width: 5px
+      background: green
+    }
   }
 }
 
@@ -31,17 +90,19 @@ body {
 }
 
 .window {
-  position: absolute
+  position: fixed
   width: 220px
   height: 100px
-  background: white
+  background: rgba(0,0,0,.5)
   border-radius: 5px
-  box-shadow: 0 1px 5px rgba(0,0,0,.5)
+  box-shadow: 0 2px 0 rgba(0,0,0,.4)
   z-index: 100
   pointer-events: none
-  font-size: 11px
+  font-size: 13px
+  color: white
+  border: 1px solid rgba(0,0,0,.7)
 
   p {
-    padding: 5px
+    padding: 8px
   }
 }
