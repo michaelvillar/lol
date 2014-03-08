@@ -4,6 +4,10 @@ Cluster = require('cluster.coffee')
 rand = (from, to) =>
   Math.round(Math.random() * (to - from) + from)
 
+normalDistribution = (mean, stdev) =>
+  random = rand(-1, 1) + rand(-1, 1) + rand(-1, 1)
+  return Math.round(random * stdev + mean)
+
 class City extends Model
   constructor: ->
     super
@@ -46,13 +50,22 @@ class City extends Model
                     Math.min(@size[1] - 1, Math.max(0, rand(centerRef[1] - padding, centerRef[1] + padding)))])
 
     addPeople = (i, nx, ny) =>
+      # return if nx < 0 or nx >= @size[0]
+      # return if ny < 0 or ny >= @size[1]
+      # cluster = @clustersGrid[nx][ny]
+      # r = 0.0025 * @size[0] * @size[1]
+      # k = Math.max(0.01, 1 - (Math.abs(i) / r))
+      # number = rand(lowBound * k, highBound * k)
+
+      # cluster.addPeople(number)
+      # @population += number
       return if nx < 0 or nx >= @size[0]
       return if ny < 0 or ny >= @size[1]
       cluster = @clustersGrid[nx][ny]
-      r = 0.0025 * @size[0] * @size[1]
-      k = Math.max(0.01, 1 - (Math.abs(i) / r))
-      number = rand(lowBound * k, highBound * k)
-
+      mean = 300 - i * 6
+      density = 0.8
+      stddev = 150 * (1  - density) * 0.5
+      number = Math.max(normalDistribution(mean, stddev), 0);
       cluster.addPeople(number)
       @population += number
 
